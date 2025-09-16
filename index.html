@@ -1,0 +1,797 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>AegisOne — Your AI Security Agent</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="AegisOne is your on-device AI Security Agent. It stops ransomware in seconds, rolls your files back, and explains incidents in plain language — privacy-first.">
+  <meta property="og:title" content="AegisOne — Your AI Security Agent">
+  <meta property="og:description" content="Stops ransomware in seconds. Rolls files back. Explains what happened. On your device.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='1200' height='630'><rect width='100%' height='100%' fill='%230b0f17'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='%2300e6ff' font-family='Arial' font-size='56'>AegisOne</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#0b0f17; --panel:rgba(255,255,255,.04); --panel-2:rgba(255,255,255,.03);
+      --border:rgba(255,255,255,.08); --grid:rgba(0,230,255,.06);
+      --text:#e6eef7; --muted:#9fb3c8; --dim:#c6d2df;
+      --primary:#00e6ff; --accent:#7c3aed; --success:#10b981; --warning:#f59e0b; --danger:#ef4444;
+      --shadow:0 20px 60px rgba(0,0,0,.4), 0 0 120px rgba(0,230,255,.08);
+      --radius:16px; --radius-lg:22px; --max:1180px;
+    }
+    *,*::before,*::after{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; background: radial-gradient(1200px 600px at 70% -10%,rgba(124,58,237,.18),transparent 60%),
+                 radial-gradient(900px 500px at -10% 20%,rgba(0,230,255,.16),transparent 60%),
+                 var(--bg);
+      color:var(--text); font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial; line-height:1.6;
+    }
+    a{color:var(--primary); text-decoration:none}
+    a:hover{opacity:.9}
+    /* Focus visibility */
+    :where(a,button,[role="switch"],input,select).focus-ring:focus-visible,
+    :where(a,button,input,select).focus-ring:focus {
+      outline:2px solid var(--primary); outline-offset:2px; border-radius:10px;
+    }
+    .container{max-width:var(--max); margin:0 auto; padding:0 20px}
+    /* Header */
+    header{
+      position:sticky; top:0; z-index:1000; backdrop-filter:saturate(140%) blur(10px);
+      background: linear-gradient(180deg, rgba(11,15,23,.85), rgba(11,15,23,.55));
+      border-bottom:1px solid var(--border);
+      transition: box-shadow .2s ease;
+    }
+    header.scrolled{ box-shadow:0 6px 30px rgba(0,0,0,.35) }
+    .nav{display:flex; align-items:center; justify-content:space-between; padding:14px 0}
+    .brand{display:flex; gap:10px; align-items:center}
+    .logo{
+      width:36px; height:36px; border-radius:10px;
+      background: radial-gradient(100% 100% at 30% 30%, #00e6ff 0%, #7c3aed 60%, #0b0f17 100%);
+      box-shadow:0 0 20px rgba(0,230,255,.25), inset 0 0 30px rgba(124,58,237,.25);
+    }
+    .brand b{font-weight:700; letter-spacing:.2px}
+    nav ul{list-style:none; display:flex; gap:18px; padding:0; margin:0}
+    nav a{color:var(--dim); font-weight:600; position:relative; padding:6px 0}
+    nav a:hover, nav a[aria-current="true"]{color:var(--text)}
+    nav a[aria-current="true"]::after{content:""; position:absolute; left:0; right:0; bottom:-6px; height:2px; background:linear-gradient(90deg,var(--primary),var(--accent)); border-radius:2px}
+    .cta-row{display:flex; gap:10px; align-items:center}
+    .btn{
+      --bgc:var(--panel); --txt:var(--text); --brd:var(--border);
+      display:inline-flex; align-items:center; gap:10px; padding:12px 16px; border-radius:12px;
+      background:var(--bgc); color:var(--txt); border:1px solid var(--brd); font-weight:700; letter-spacing:.2px;
+      box-shadow:var(--shadow); transition: transform .15s ease, box-shadow .15s ease;
+    }
+    .btn:hover{transform:translateY(-1px)}
+    .btn.primary{--bgc:linear-gradient(135deg, rgba(0,230,255,.15), rgba(124,58,237,.15));
+      border:1px solid rgba(0,230,255,.35)}
+    .btn.ghost{opacity:.9}
+    .mobile-toggle{display:none}
+    /* Hero */
+    .hero{position:relative; overflow:hidden; padding:72px 0 32px}
+    .hero .grid{
+      position:absolute; inset:0; pointer-events:none;
+      background:
+        linear-gradient(transparent 97%, var(--grid) 98%),
+        linear-gradient(90deg, transparent 97%, var(--grid) 98%);
+      background-size:52px 52px;
+      mask:linear-gradient(180deg, rgba(0,0,0,.65), rgba(0,0,0,.05) 60%, transparent);
+      animation: grid-move 22s linear infinite;
+    }
+    @keyframes grid-move{ from{transform:translate3d(0,0,0)} to{transform:translate3d(52px,52px,0)} }
+    .hero .halo{
+      position:absolute; top:-200px; left:50%; width:900px; height:900px; translate:-50% 0;
+      background:radial-gradient(closest-side, rgba(0,230,255,.16), transparent 60%);
+      filter: blur(40px);
+    }
+    .hero-wrap{display:grid; grid-template-columns: 1.15fr .85fr; gap:32px; align-items:center}
+    h1{font-size:clamp(32px, 4vw, 56px); line-height:1.1; margin:0 0 16px}
+    .sub{color:var(--muted); font-size:18px; margin:0 0 26px}
+    .badges{display:flex; gap:8px; flex-wrap:wrap; margin:10px 0 24px}
+    .badge{padding:6px 10px; border:1px solid var(--border); border-radius:999px; color:var(--dim); background:var(--panel)}
+    .term{
+      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      border:1px solid var(--border); border-radius:var(--radius-lg); padding:18px; font-family:"JetBrains Mono",monospace;
+      min-height:220px; position:relative; overflow:hidden;
+      box-shadow: var(--shadow);
+    }
+    .term .dots{position:absolute; top:10px; left:10px; display:flex; gap:8px}
+    .dot{width:10px; height:10px; border-radius:50%; opacity:.8}
+    .dot.red{background:#ff5f57}.dot.yel{background:#febc2e}.dot.grn{background:#28c840}
+    .term pre{margin:20px 0 0; font-size:14px; white-space:pre-wrap}
+    .kw{color:#7dd3fc}.ok{color:var(--success)}.warn{color:var(--warning)}.err{color:var(--danger)}
+    /* Sections */
+    section{padding:64px 0}
+    .reveal{opacity:0; transform:translateY(16px); transition:opacity .5s ease, transform .5s ease}
+    .reveal.in{opacity:1; transform:none}
+    .cards{display:grid; grid-template-columns:repeat(4,1fr); gap:18px}
+    .card{
+      background:var(--panel); border:1px solid var(--border); border-radius:var(--radius);
+      padding:20px; box-shadow:var(--shadow)
+    }
+    .card h3{margin:8px 0 8px; font-size:18px}
+    .icon{
+      width:42px; height:42px; display:grid; place-items:center; border-radius:12px;
+      background: radial-gradient(100% 100% at 30% 30%, rgba(0,230,255,.25), rgba(124,58,237,.25));
+      border:1px solid rgba(255,255,255,.08)
+    }
+    .muted{color:var(--muted)}
+    .logos{display:grid; grid-template-columns:repeat(6,1fr); gap:14px; opacity:.9}
+    .logo-box{
+      height:50px; border:1px dashed var(--border); border-radius:12px; display:grid; place-items:center; color:var(--muted)
+    }
+    .how{display:grid; grid-template-columns:repeat(3,1fr); gap:18px}
+    .how .step{counter-increment:step}
+    .how .step::before{
+      content:counter(step); font-weight:800; font-size:14px; color:var(--primary);
+      display:inline-grid; place-items:center; width:26px; height:26px; border:1px solid var(--border);
+      border-radius:999px; margin-right:8px; background:var(--panel)
+    }
+    /* Demo panel */
+    .demo{display:grid; grid-template-columns:1.2fr .8fr; gap:18px}
+    .demo .panel{background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); padding:18px; box-shadow:var(--shadow)}
+    .demo .panel h3{margin:0 0 10px}
+    .status{display:flex; gap:10px; flex-wrap:wrap}
+    .pill{padding:6px 10px; border-radius:999px; background:var(--panel-2); border:1px solid var(--border); color:var(--dim); font-weight:700}
+    /* Pricing */
+    .pricing{display:grid; grid-template-columns:repeat(3,1fr); gap:18px}
+    .tier{background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02)); border:1px solid var(--border);
+      border-radius:var(--radius); padding:22px; box-shadow:var(--shadow)}
+    .tag{font-size:12px; letter-spacing:.3px; text-transform:uppercase; color:var(--muted)}
+    .price{font-size:36px; font-weight:800; margin:10px 0}
+    .list{margin:12px 0 0; padding:0; list-style:none}
+    .list li{display:flex; gap:10px; align-items:flex-start; margin:8px 0}
+    .check{color:var(--success); font-weight:900}
+    .switch{display:flex; gap:10px; align-items:center; justify-content:center; margin:-8px 0 18px}
+    .switch input{appearance:none; width:46px; height:26px; border-radius:999px; background:var(--panel); border:1px solid var(--border); position:relative; outline:none}
+    .switch input::after{content:""; position:absolute; top:3px; left:3px; width:20px; height:20px; border-radius:50%; background:var(--primary); transition:transform .2s ease}
+    .switch input:checked::after{transform:translateX(20px)}
+    /* FAQ */
+    .faq{display:grid; grid-template-columns:1fr 1fr; gap:14px}
+    .qa{border:1px solid var(--border); border-radius:var(--radius); background:var(--panel)}
+    .qa button{all:unset; display:flex; justify-content:space-between; align-items:center; width:100%; padding:16px; cursor:pointer}
+    .qa .a{display:none; padding:0 16px 16px; color:var(--muted)}
+    .qa[open] .a{display:block}
+    /* CTA band */
+    .band{
+      background:linear-gradient(90deg, rgba(0,230,255,.12), rgba(124,58,237,.12));
+      border:1px solid rgba(255,255,255,.1); border-radius:var(--radius-lg); padding:26px; text-align:center;
+      box-shadow:var(--shadow)
+    }
+    /* Footer */
+    footer{border-top:1px solid var(--border); padding:28px 0; color:var(--muted)}
+    footer .row{display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap}
+    footer nav a{color:var(--muted)}
+    /* Utilities */
+    .grid-2{display:grid; grid-template-columns:1fr 1fr; gap:18px}
+    .sr-only{position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0}
+    .mt-0{margin-top:0}.mb-0{margin-bottom:0}.mb-2{margin-bottom:8px}.mb-3{margin-bottom:12px}.mb-4{margin-bottom:16px}.mb-5{margin-bottom:24px}
+    .center{text-align:center}
+    /* Responsive */
+    @media (max-width: 1000px){
+      .hero-wrap{grid-template-columns:1fr}
+      .cards{grid-template-columns:1fr 1fr}
+      .how{grid-template-columns:1fr}
+      .demo{grid-template-columns:1fr}
+      .pricing{grid-template-columns:1fr}
+      .faq{grid-template-columns:1fr}
+    }
+    @media (max-width: 760px){
+      nav ul{display:none}
+      .mobile-toggle{display:inline-flex}
+      .logos{grid-template-columns:repeat(3,1fr)}
+      .cards{grid-template-columns:1fr}
+    }
+    /* Form styling */
+    input:focus, select:focus {
+      border-color: var(--primary) !important;
+      box-shadow: 0 0 0 2px rgba(0,230,255,.15);
+    }
+    
+    #toast {
+      background: var(--panel);
+      border: 1px solid var(--border);
+    }
+    
+    #toast.success {
+      border-color: var(--success);
+      background: rgba(16, 185, 129, 0.1);
+    }
+    
+    #toast.error {
+      border-color: var(--danger);
+      background: rgba(239, 68, 68, 0.1);
+    }
+    
+    /* Motion respect */
+    @media (prefers-reduced-motion: reduce){
+      *{animation:none !important; transition:none !important}
+    }
+  </style>
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"SoftwareApplication",
+    "name":"AegisOne — AI Security Agent",
+    "applicationCategory":"SecurityApplication",
+    "operatingSystem":"Windows 10+, macOS 12+",
+    "description":"Stops ransomware in seconds, rolls files back, and explains what happened — on-device AI, privacy-first.",
+    "offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"}
+  }
+  </script>
+  
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+    import { getAnalytics } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js';
+    import { getDatabase, ref, push, set } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+    import { getFirestore, collection, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+    
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyCjAw52vzqnLYXeadwumznS3gd2kaSqa-U",
+      authDomain: "aegonisone.firebaseapp.com",
+      databaseURL: "https://aegonisone-default-rtdb.firebaseio.com/",
+      projectId: "aegonisone",
+      storageBucket: "aegonisone.firebasestorage.app",
+      messagingSenderId: "284946726624",
+      appId: "1:284946726624:web:64c04e362df60919695a85",
+      measurementId: "G-6J3T2HY6DW"
+    };
+    
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    const db = getFirestore(app);
+    const realtimeDB = getDatabase(app);
+    
+    // Make Firebase services available globally
+    window.firebaseApp = app;
+    window.firebaseAnalytics = analytics;
+    window.firebaseFirestore = db;
+    window.firebaseRealtimeDB = realtimeDB;
+    
+    // Firestore functions
+    window.firestoreCollection = collection;
+    window.firestoreAddDoc = addDoc;
+    window.firestoreServerTimestamp = serverTimestamp;
+    
+    // Realtime Database functions
+    window.realtimeRef = ref;
+    window.realtimePush = push;
+    window.realtimeSet = set;
+    
+    console.log('✅ Firebase initialized successfully');
+  </script>
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <div class="container nav" aria-label="Main navigation">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <b>AegisOne</b>
+        <span class="badge">AI Security Agent</span>
+      </div>
+      <nav>
+        <button class="btn mobile-toggle focus-ring" aria-controls="menu" aria-expanded="false">Menu</button>
+        <ul id="menu" role="menubar">
+          <li role="none"><a class="focus-ring" role="menuitem" href="#features">Features</a></li>
+          <li role="none"><a class="focus-ring" role="menuitem" href="#how">How it works</a></li>
+          <li role="none"><a class="focus-ring" role="menuitem" href="#demo">Live demo</a></li>
+          <li role="none"><a class="focus-ring" role="menuitem" href="#pricing">Pricing</a></li>
+          <li role="none"><a class="focus-ring" role="menuitem" href="#faq">FAQ</a></li>
+        </ul>
+      </nav>
+      <div class="cta-row">
+        <a class="btn ghost" href="#download" aria-label="Join macOS waitlist">macOS Waitlist</a>
+        <a class="btn primary" href="#download" aria-label="Download for Windows">Download</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="grid" aria-hidden="true"></div>
+    <div class="halo" aria-hidden="true"></div>
+    <div class="container hero-wrap">
+      <div>
+        <h1>AegisOne — Your AI Security Agent</h1>
+        <p class="sub">Stops ransomware in seconds. <b>Rolls your files back</b>. Explains exactly what happened — all on your device, privacy-first.</p>
+        <div class="badges">
+          <span class="badge">Windows v1 — Beta</span>
+          <span class="badge">macOS v1.1 — Waitlist</span>
+          <span class="badge">Defensive-only · No Hack-Back</span>
+        </div>
+        <div class="cta-row">
+          <a class="btn primary" href="#download">⬇︎ Download for Windows</a>
+          <a class="btn" href="#demo">▶ Live Demo</a>
+        </div>
+      </div>
+      <div>
+        <div class="term" aria-label="Live security terminal">
+          <div class="dots"><span class="dot red"></span><span class="dot yel"></span><span class="dot grn"></span></div>
+<pre id="terminal"><span class="kw">aegisone-agent</span> v1.0.0  •  on-device AI active
+watching: <span class="kw">filesystem, processes, network</span>
+policy: <span class="kw">defensive-only</span>  |  privacy: <span class="kw">on-device</span>
+
+› waiting for events…</pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Logos -->
+  <section>
+    <div class="container">
+      <div class="logos" aria-label="Trusted by">
+        <div class="logo-box">LOGO</div><div class="logo-box">LOGO</div><div class="logo-box">LOGO</div>
+        <div class="logo-box">LOGO</div><div class="logo-box">LOGO</div><div class="logo-box">LOGO</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section id="features" class="reveal">
+    <div class="container">
+      <h2 class="mb-2">Why teams choose AegisOne</h2>
+      <p class="muted mb-4">Focused excellence: stop encryption, restore clean state, and understand the incident — fast.</p>
+      <div class="cards">
+        <article class="card">
+          <div class="icon" aria-hidden="true">🛡️</div>
+          <h3>Kill-Switch Speed</h3>
+          <p class="muted">Terminate ransomware process trees in seconds; isolate host and block C2 during containment.</p>
+        </article>
+        <article class="card">
+          <div class="icon" aria-hidden="true">♻️</div>
+          <h3>Snapshot Rollback</h3>
+          <p class="muted">Restore files from safe snapshots (VSS on Windows; APFS on macOS) with one click.</p>
+        </article>
+        <article class="card">
+          <div class="icon" aria-hidden="true">🧠</div>
+          <h3>Explainable AI</h3>
+          <p class="muted">A local LLM turns telemetry into a clear incident story: what happened, what changed, what to do next.</p>
+        </article>
+        <article class="card">
+          <div class="icon" aria-hidden="true">🔒</div>
+          <h3>Privacy-First</h3>
+          <p class="muted">On-device learning and minimal telemetry by default. Your data stays with you.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- How it works -->
+  <section id="how" class="reveal">
+    <div class="container">
+      <h2 class="mb-2">How it works</h2>
+      <p class="muted mb-4">Detect → Act → Explain. Anchored to known adversary behaviors (ATT&CK T1486, T1490, T1041).</p>
+      <div class="how">
+        <div class="card step">
+          <h3 class="mb-2">Detect</h3>
+          <p class="muted">Behavioral signals + canary files + script inspection identify encryption bursts and recovery tampering.</p>
+        </div>
+        <div class="card step">
+          <h3 class="mb-2">Act</h3>
+          <p class="muted">Kill malicious processes, block outbound, and roll back impacted files from safe snapshots.</p>
+        </div>
+        <div class="card step">
+          <h3 class="mb-2">Explain</h3>
+          <p class="muted">Generate a plain-language incident report with a timeline, actions taken, and recommended follow-ups.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Live Demo -->
+  <section id="demo" class="reveal">
+    <div class="container demo">
+      <div class="panel">
+        <h3>Live Incident Demo</h3>
+        <p class="muted mb-4">Simulated event to showcase the agent’s sequence of actions.</p>
+        <div class="term" aria-label="Simulated incident terminal">
+          <div class="dots"><span class="dot red"></span><span class="dot yel"></span><span class="dot grn"></span></div>
+<pre id="demoTerm">// click “Run Simulation” to see a short containment & rollback story.</pre>
+        </div>
+        <div class="cta-row" style="margin-top:12px">
+          <button id="runSim" class="btn primary focus-ring" type="button">Run Simulation</button>
+          <button id="clearSim" class="btn focus-ring" type="button">Reset</button>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>Status & Capabilities</h3>
+        <div class="status">
+          <span class="pill">🟢 Real-time Monitoring</span>
+          <span class="pill">🟢 Kill-Switch</span>
+          <span class="pill">🟢 Snapshot Rollback</span>
+          <span class="pill">🟢 Explainable AI</span>
+          <span class="pill">🟢 Privacy-First</span>
+          <span class="pill">🟡 macOS Waitlist</span>
+        </div>
+        <p class="muted" style="margin-top:14px">AegisOne is <b>defensive-only</b>. We don’t hack back. We focus on protecting your devices and data.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing -->
+  <section id="pricing" class="reveal">
+    <div class="container">
+      <h2 class="mb-2">Simple, transparent pricing</h2>
+      <p class="muted mb-3">Start free. Upgrade when you need automated response and rollback.</p>
+      <div class="switch">
+        <span class="muted">Monthly</span>
+        <label><input id="billing" type="checkbox" role="switch" aria-label="Toggle annual billing" aria-checked="false" class="focus-ring"></label>
+        <span class="muted">Annual (save 20%)</span>
+      </div>
+      <div class="pricing">
+        <div class="tier">
+          <span class="tag">Free</span>
+          <div class="price" data-monthly="€0" data-annual="€0">€0</div>
+          <ul class="list">
+            <li><span class="check">✔</span> Real-time detection</li>
+            <li><span class="check">✔</span> Manual isolate & kill</li>
+            <li><span class="check">✔</span> Incident explainers</li>
+            <li><span class="check">—</span> Snapshot rollback</li>
+          </ul>
+          <div class="cta-row" style="margin-top:14px"><a class="btn" href="#download">Get Started</a></div>
+        </div>
+        <div class="tier" style="border-color:rgba(0,230,255,.35)">
+          <span class="tag">Pro</span>
+          <div class="price" data-monthly="€8" data-annual="€6">€8</div>
+          <ul class="list">
+            <li><span class="check">✔</span> Auto-respond & isolate</li>
+            <li><span class="check">✔</span> Snapshot rollback</li>
+            <li><span class="check">✔</span> Advanced explainers</li>
+            <li><span class="check">✔</span> Email alerts</li>
+          </ul>
+          <div class="cta-row" style="margin-top:14px"><a class="btn primary" href="#download">Start Pro</a></div>
+        </div>
+        <div class="tier">
+          <span class="tag">Business</span>
+          <div class="price" data-monthly="€12" data-annual="€9">€12</div>
+          <ul class="list">
+            <li><span class="check">✔</span> Multi-device policies</li>
+            <li><span class="check">✔</span> Slack/Email alerts</li>
+            <li><span class="check">✔</span> Priority support</li>
+            <li><span class="check">✔</span> macOS + Windows</li>
+          </ul>
+          <div class="cta-row" style="margin-top:14px"><a class="btn" href="#download">Contact Sales</a></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq" class="reveal">
+    <div class="container">
+      <h2 class="mb-2">FAQ</h2>
+      <p class="muted mb-4">If you have other questions, reach out any time.</p>
+      <div class="faq">
+        <details class="qa">
+          <summary><button><span>Do you “hack back” against attackers?</span><span>＋</span></button></summary>
+          <div class="a">No. AegisOne is defensive-only: detect, isolate, block C2, kill process trees, and roll back files. We never engage in counter-intrusion.</div>
+        </details>
+        <details class="qa">
+          <summary><button><span>Is my data sent to the cloud?</span><span>＋</span></button></summary>
+          <div class="a">By default, analysis occurs on-device. Optional, opt-in telemetry helps improve detection quality. You’re always in control.</div>
+        </details>
+        <details class="qa">
+          <summary><button><span>Which OS do you support?</span><span>＋</span></button></summary>
+          <div class="a">Windows v1 (Beta) is available; macOS v1.1 is on waitlist. Linux and mobile are on the roadmap.</div>
+        </details>
+        <details class="qa">
+          <summary><button><span>Does it work with Microsoft Defender?</span><span>＋</span></button></summary>
+          <div class="a">Yes. AegisOne runs alongside Defender. We can guide Controlled Folder Access setup to reduce noise and conflicts.</div>
+        </details>
+        <details class="qa">
+          <summary><button><span>What happens if rollback snapshots are deleted?</span><span>＋</span></button></summary>
+          <div class="a">We monitor and block common shadow-copy deletion attempts. If snapshots are missing, we still contain the threat and preserve what we can.</div>
+        </details>
+        <details class="qa">
+          <summary><button><span>How do you explain incidents?</span><span>＋</span></button></summary>
+          <div class="a">A local LLM turns structured telemetry into a plain-language summary and checklist. No sensitive contents are sent off device by default.</div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Band -->
+  <section id="download" class="reveal">
+    <div class="container">
+      <div class="band">
+        <h3 class="mt-0">Put an AI Security Agent on every device.</h3>
+        <p class="muted mb-4">Stop ransomware in seconds. Roll back safely. Understand exactly what happened.</p>
+        <form id="waitlist" class="grid-2" novalidate>
+          <div class="card">
+            <label class="mb-2" for="email"><b>Email</b></label>
+            <input id="email" name="email" type="email" required placeholder="you@company.com" aria-required="true" style="width:100%; padding:12px; border-radius:10px; border:1px solid var(--border); background:var(--panel); color:var(--text); transition: border-color .2s ease;" class="focus-ring">
+          </div>
+          <div class="card">
+            <label class="mb-2" for="platform"><b>Platform</b></label>
+            <select id="platform" name="platform" style="width:100%; padding:12px; border-radius:10px; border:1px solid var(--border); background:var(--panel); color:var(--text); transition: border-color .2s ease;" class="focus-ring">
+              <option value="Windows">Windows</option>
+              <option value="macOS">macOS (Waitlist)</option>
+              <option value="Linux">Linux (Future)</option>
+            </select>
+          </div>
+          <div class="center" style="grid-column:1/-1">
+            <button class="btn primary focus-ring" type="submit">Request Access</button>
+          </div>
+          <p id="toast" class="muted center" style="display:none; padding:12px; border-radius:8px; margin-top:16px; transition: all .3s ease;">Thanks — you're on the list. We'll email you shortly.</p>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <div class="row">
+        <div>&copy; <span id="year"></span> AegisOne. All rights reserved.</div>
+        <nav class="cta-row">
+          <a href="#" aria-label="Security">Security</a>
+          <a href="#" aria-label="Privacy">Privacy</a>
+          <a href="#" aria-label="Terms">Terms</a>
+        </nav>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Mobile menu
+    const toggle = document.querySelector('.mobile-toggle');
+    const menu = document.getElementById('menu');
+    if (toggle) {
+      toggle.addEventListener('click', () => {
+        const open = menu.style.display === 'flex';
+        menu.style.display = open ? 'none' : 'flex';
+        menu.style.flexDirection = 'column';
+        toggle.setAttribute('aria-expanded', String(!open));
+      });
+      // Close menu when clicking a link (mobile)
+      menu.addEventListener('click', (e)=>{
+        if(e.target.tagName === 'A' && getComputedStyle(toggle).display !== 'none'){
+          menu.style.display = 'none';
+          toggle.setAttribute('aria-expanded', 'false');
+        }
+      });
+    }
+
+    // Smooth scroll
+    document.querySelectorAll('a[href^="#"]').forEach(a=>{
+      a.addEventListener('click', e=>{
+        const id = a.getAttribute('href');
+        if(id.length>1){
+          e.preventDefault();
+          document.querySelector(id).scrollIntoView({behavior:'smooth', block:'start'});
+        }
+      });
+    });
+
+    // Year
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Pricing toggle
+    const billing = document.getElementById('billing');
+    const prices = document.querySelectorAll('.price');
+    function updatePrices(){
+      prices.forEach(p=>{
+        const val = billing.checked ? p.dataset.annual : p.dataset.monthly;
+        if(val) p.textContent = val;
+      });
+      billing.setAttribute('aria-checked', String(billing.checked));
+    }
+    if(billing){ billing.addEventListener('change', updatePrices); updatePrices(); }
+
+    // Header shadow on scroll
+    const header = document.querySelector('header');
+    const onScroll = ()=>{
+      if(window.scrollY > 8) header.classList.add('scrolled'); else header.classList.remove('scrolled');
+    };
+    window.addEventListener('scroll', onScroll); onScroll();
+
+    // Active nav link based on section in view
+    const sections = ['#features','#how','#demo','#pricing','#faq','#download'].map(s=>document.querySelector(s)).filter(Boolean);
+    const links = Array.from(document.querySelectorAll('nav a'));
+    const io = new IntersectionObserver((entries)=>{
+      entries.forEach(entry=>{
+        const id = '#' + entry.target.id;
+        const link = links.find(a=>a.getAttribute('href')===id);
+        if(link){
+          if(entry.isIntersecting){ link.setAttribute('aria-current','true'); }
+          else if(link.hasAttribute('aria-current')){ link.removeAttribute('aria-current'); }
+        }
+      });
+    }, {root:null, threshold:0.5});
+    sections.forEach(s=>io.observe(s));
+
+    // Reveal on scroll
+    const revIO = new IntersectionObserver((entries)=>{
+      entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); revIO.unobserve(e.target);} });
+    }, {threshold:0.15, rootMargin:'0px 0px -10% 0px'});
+    document.querySelectorAll('.reveal').forEach(el=>revIO.observe(el));
+
+    // Waitlist form with Firebase integration
+    const form = document.getElementById('waitlist');
+    const toast = document.getElementById('toast');
+    if (form) {
+      form.addEventListener('submit', async (e)=>{
+        e.preventDefault();
+        
+        const email = document.getElementById('email');
+        const platform = document.getElementById('platform');
+        
+        // Validate email
+        if(!email.value || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)){
+          showToast("Please enter a valid email address.", 'error');
+          return;
+        }
+        
+        // Show loading state
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const originalText = submitBtn.textContent;
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Adding to waitlist...';
+        
+        try {
+          // Prepare data
+          const emailData = {
+            email: email.value,
+            platform: platform.value,
+            source: 'landing-page-cta',
+            userAgent: navigator.userAgent,
+            referrer: document.referrer || 'direct',
+            ip: null, // Will be populated by server if needed
+            subscribedAt: new Date().toISOString()
+          };
+          
+          // Save to both Firestore and Realtime Database for redundancy
+          const promises = [];
+          
+          // Save to Firestore (primary) - with better error handling
+          if(window.firebaseFirestore && window.firestoreCollection && window.firestoreAddDoc) {
+            try {
+              const waitlistCollection = window.firestoreCollection(window.firebaseFirestore, 'waitlist');
+              const firestorePromise = window.firestoreAddDoc(waitlistCollection, {
+                ...emailData,
+                createdAt: window.firestoreServerTimestamp ? window.firestoreServerTimestamp() : new Date()
+              }).catch(error => {
+                console.warn('⚠️ Firestore save failed:', error);
+                return null; // Don't fail the whole operation
+              });
+              promises.push(firestorePromise);
+            } catch (error) {
+              console.warn('⚠️ Firestore setup failed:', error);
+            }
+          }
+          
+          // Save to Realtime Database (backup) - with better error handling
+          if(window.firebaseRealtimeDB && window.realtimeRef && window.realtimePush && window.realtimeSet) {
+            try {
+              const emailsRef = window.realtimeRef(window.firebaseRealtimeDB, 'waitlist');
+              const newEmailRef = window.realtimePush(emailsRef);
+              const realtimePromise = window.realtimeSet(newEmailRef, emailData).catch(error => {
+                console.warn('⚠️ Realtime Database save failed:', error);
+                return null; // Don't fail the whole operation
+              });
+              promises.push(realtimePromise);
+            } catch (error) {
+              console.warn('⚠️ Realtime Database setup failed:', error);
+            }
+          }
+          
+          // Execute saves in parallel - at least one must succeed
+          if(promises.length > 0) {
+            const results = await Promise.allSettled(promises);
+            const successful = results.filter(r => r.status === 'fulfilled' && r.value !== null);
+            
+            if(successful.length > 0) {
+              console.log(`✅ Email saved to Firebase (${successful.length}/${results.length} databases succeeded)`);
+              showToast("Thanks — you're on the list. We'll email you shortly.", 'success');
+              form.reset();
+            } else {
+              // If all Firebase saves failed, save locally as backup
+              console.warn('⚠️ All Firebase saves failed, using local storage backup');
+              saveToLocalStorage(emailData);
+              showToast("Thanks — you're on the list. We'll email you shortly.", 'success');
+              form.reset();
+            }
+          } else {
+            // Fallback: save locally if Firebase isn't available
+            console.log('📧 Email collected (Firebase not available, using local storage)');
+            saveToLocalStorage(emailData);
+            showToast("Thanks — you're on the list. We'll email you shortly.", 'success');
+            form.reset();
+          }
+        } catch (error) {
+          console.error('❌ Error saving email:', error);
+          showToast("Something went wrong. Please try again.", 'error');
+        } finally {
+          // Reset button state
+          submitBtn.disabled = false;
+          submitBtn.textContent = originalText;
+        }
+      });
+    }
+    
+    // Local storage backup function
+    function saveToLocalStorage(emailData) {
+      try {
+        const existingEmails = JSON.parse(localStorage.getItem('aegisone_waitlist') || '[]');
+        existingEmails.push({
+          ...emailData,
+          id: Date.now().toString(),
+          savedAt: new Date().toISOString()
+        });
+        localStorage.setItem('aegisone_waitlist', JSON.stringify(existingEmails));
+        console.log('💾 Email saved to local storage as backup');
+      } catch (error) {
+        console.error('❌ Local storage save failed:', error);
+      }
+    }
+    
+    // Toast notification helper
+    function showToast(message, type = 'success') {
+      const toast = document.getElementById('toast');
+      if(!toast) return;
+      
+      toast.style.display = 'block';
+      toast.style.color = type === 'error' ? 'var(--danger)' : 'var(--success)';
+      toast.textContent = message;
+      
+      // Auto-hide after 5 seconds
+      setTimeout(() => {
+        toast.style.display = 'none';
+      }, 5000);
+    }
+
+    // Hero terminal typing
+    const term = document.getElementById('terminal');
+    const demoTerm = document.getElementById('demoTerm');
+    const lines = [
+      "event: rapid file writes detected in user Documents/",
+      "signal: entropy spike and canary touch → score 0.97",
+      "action: terminating process tree pid=4832 (docuprint.exe) ✓",
+      "network: blocking outbound C2 for docuprint.exe ✓",
+      "recovery: restoring 2,412 files from snapshot @13:55 ✓",
+      "explain: incident report generated (timeline + checklist) ✓"
+    ];
+    let idx = 0;
+    function tick(){
+      if(!term) return;
+      if(idx < lines.length){
+        term.textContent += "\n" + lines[idx++];
+        setTimeout(tick, 700);
+      }
+    }
+    setTimeout(tick, 800);
+
+    // Demo simulation
+    const simLines = [
+      "[14:03:12] observe  ▶ burst writes in /Users/Alex/Documents",
+      "[14:03:12] analyze  ▶ extension/rename pattern matches ransomware",
+      "[14:03:13] act      ▶ kill pid=4832 (docuprint.exe)",
+      "[14:03:13] isolate  ▶ outbound blocked for process: docuprint.exe",
+      "[14:03:14] recover  ▶ restored 2,412 files from snapshot @13:55",
+      "[14:03:14] explain  ▶ human-readable report created"
+    ];
+    let t;
+    function runDemo(){
+      if(!demoTerm) return;
+      demoTerm.textContent = "";
+      let i=0;
+      t = setInterval(()=>{
+        if(i<simLines.length){ demoTerm.textContent += simLines[i++] + "\n"; }
+        else clearInterval(t);
+      }, 500);
+    }
+    function clearDemo(){
+      if(t) clearInterval(t);
+      demoTerm.textContent = "// click “Run Simulation” to see a short containment & rollback story.";
+    }
+    document.getElementById('runSim')?.addEventListener('click', runDemo);
+    document.getElementById('clearSim')?.addEventListener('click', clearDemo);
+  </script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+{
+  "rules": {
+    "waitlist": {
+      ".write": true,
+      ".read": false
+    },
+    "$other": {
+      ".read": false,
+      ".write": false
+    }
+  }
+}

@@ -1,0 +1,18 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Allow anyone to write to waitlist (for landing page form)
+    match /waitlist/{document} {
+      allow create: if true; // Allow creating new documents
+      allow write: if true;  // Allow all writes for now
+      allow read: if false;  // No public read access
+      allow update: if false; // No updates allowed
+      allow delete: if false; // No deletes allowed
+    }
+    
+    // Default rule: deny all other access
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
