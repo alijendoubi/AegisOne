@@ -1,12 +1,12 @@
-mod cli;
-mod config;
-mod detection;
-mod error;
-mod events;
-mod report;
-mod response;
-mod snapshot;
-mod telemetry;
+pub mod cli;
+pub mod config;
+pub mod detection;
+pub mod error;
+pub mod events;
+pub mod report;
+pub mod response;
+pub mod snapshot;
+pub mod telemetry;
 
 use std::path::PathBuf;
 use std::sync::atomic::AtomicU64;
