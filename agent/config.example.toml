@@ -1,0 +1,168 @@
+# AegisOne Agent — Configuration Reference
+# Copy this file to:
+#   Windows : %APPDATA%\AegisOne\config.toml
+#   macOS   : ~/Library/Application Support/aegisone/config.toml
+#   Linux   : ~/.config/aegisone/config.toml
+#
+# All fields are optional — omit any section to use the built-in defaults.
+
+# ── Filesystem monitoring ───────────────────────────────────────────────────────
+
+[watch]
+# Directories watched recursively for suspicious activity.
+# Defaults to Documents, Desktop, Pictures, Downloads under the current user's home.
+paths = [
+  "C:\\Users\\%USERNAME%\\Documents",
+  "C:\\Users\\%USERNAME%\\Desktop",
+  "C:\\Users\\%USERNAME%\\Pictures",
+  "C:\\Users\\%USERNAME%\\Downloads",
+]
+
+# File extensions skipped for entropy analysis (already compressed/encrypted content).
+# Adding extensions here reduces false positives and CPU usage.
+skip_extensions = [
+  ".mp4", ".mp3", ".mkv", ".avi",
+  ".zip", ".7z", ".gz", ".rar",
+  ".jpg", ".jpeg", ".png", ".gif",
+  ".exe", ".dll", ".sys",
+]
+
+# Skip entropy analysis for files larger than this (bytes). Default: 50 MB.
+entropy_max_file_bytes = 52_428_800
+
+# Number of bytes sampled from the start of a file for entropy calculation.
+# Higher values are more accurate but slower. Default: 64 KB.
+entropy_sample_bytes = 65_536
+
+# Debounce window for filesystem events (milliseconds).
+# Prevents duplicate events from rapid writes. Default: 200 ms.
+debounce_ms = 200
+
+# ── Threat scoring ──────────────────────────────────────────────────────────────
+
+[scoring]
+# Duration of each per-PID scoring window (seconds). Default: 30.
+window_secs = 30
+
+# Score thresholds that trigger each threat level.
+# Nominal: 0–24  |  Elevated: 25–49  |  High: 50–79  |  Critical: 80+
+elevated_threshold = 25
+high_threshold     = 50
+critical_threshold = 80
+
+# Shannon entropy thresholds (bits/byte, max 8.0).
+# Files with entropy above these values are flagged.
+entropy_high_bits   = 7.2   # +20 pts  — strongly indicative of encryption
+entropy_medium_bits = 6.5   # +10 pts  — ambiguous (compressed media, etc.)
+
+# Burst write rates (files/second attributed to a single PID) that trigger scoring.
+burst_high_files_sec = 50.0  # +25 pts
+burst_med_files_sec  = 20.0  # +10 pts
+
+# Multi-directory spread bonus: added when a single PID writes to ≥ N distinct
+# directories within the bonus window. Indicates lateral document targeting.
+multi_dir_bonus_dirs = 3    # minimum directories
+multi_dir_bonus_secs = 10   # time window (seconds)
+multi_dir_bonus_pts  = 15   # bonus points awarded
+
+# Known ransomware output extensions. Any rename to one of these adds +40 pts.
+# Extend this list as new ransomware families emerge.
+known_ransomware_extensions = [
+  ".locked", ".encrypted", ".crypt", ".enc",
+  ".ryk", ".ryuk", ".clop", ".ransom",
+  ".wcry", ".wncry", ".wncryt",
+  ".lck", ".cerber", ".locky", ".zepto",
+  ".odin", ".aesir", ".micro",
+  ".cryptolocker", ".cryptowall",
+  ".cryp1", ".darkness", ".wallet", ".onion",
+]
+
+# Filenames that match known ransom note patterns add +50 pts on creation.
+ransom_note_filenames = [
+  "README.txt", "DECRYPT.txt", "HOW_TO_RECOVER.txt",
+  "HOW_TO_DECRYPT.txt", "HOW_TO_BUY.txt", "RECOVERY.txt",
+  "YOUR_FILES_ARE_ENCRYPTED.txt", "!!!RESTORE_FILES!!!.txt",
+]
+
+# ── Canary files ────────────────────────────────────────────────────────────────
+
+[canary]
+# Paths where synthetic tripwire files are placed.
+# Any access, write, rename, or deletion of a canary adds +50 pts immediately.
+# %USERNAME% and %USERPROFILE% are expanded at runtime.
+paths = [
+  "C:\\Users\\%USERNAME%\\Documents\\.aegis_canary_001",
+  "C:\\Users\\%USERNAME%\\Desktop\\.aegis_canary_002",
+  "C:\\Users\\%USERNAME%\\Pictures\\.aegis_canary_003",
+]
+
+# How often to actively poll canary integrity (seconds). Default: 5.
+# The FS watcher also catches real-time events between polls.
+check_interval_secs = 5
+
+# ── Automated response ──────────────────────────────────────────────────────────
+
+[response]
+# When true: detect and score, but take NO response actions.
+# Useful for evaluation / tuning without risk. Default: false.
+dry_run = false
+
+# Kill the malicious process tree when Critical threshold is reached. Default: true.
+# Requires Administrator privileges on Windows.
+kill_on_critical = true
+
+# Inject a Windows Firewall outbound-block rule for the offending PID at High+. Default: true.
+# Requires Administrator privileges on Windows.
+block_network = true
+
+# Automatically initiate VSS snapshot rollback at Critical. Default: true.
+# Requires Administrator privileges on Windows.
+auto_rollback = true
+
+# ── VSS snapshot management ─────────────────────────────────────────────────────
+
+[snapshot]
+# Create a baseline shadow copy when the agent starts. Default: true.
+# This ensures a clean restore point exists before any attack begins.
+# Requires Administrator privileges and sufficient disk space.
+create_on_start = true
+
+# Volume to shadow (used for both baseline creation and rollback). Default: "C:".
+volume = "C:"
+
+# Maximum number of AegisOne-created shadow copies to retain.
+# Oldest copies are deleted when this limit is exceeded. Default: 3.
+max_retained = 3
+
+# ── Incident reports ────────────────────────────────────────────────────────────
+
+[report]
+# Directory where incident reports and rollback manifests are written.
+# Default: %PROGRAMDATA%\AegisOne\reports  (Windows)
+#          ~/.aegisone/reports              (Linux/macOS)
+output_dir = "C:\\ProgramData\\AegisOne\\reports"
+
+# Enrich reports with a plain-language AI narrative via a local Ollama instance.
+# Ollama failure is non-fatal — the structured Markdown report always runs first.
+use_ollama = false
+
+# Base URL of the local Ollama API server. Default: "http://localhost:11434".
+ollama_url = "http://localhost:11434"
+
+# Ollama model to use for narrative generation. Default: "llama3".
+# Other good options: "phi3", "mistral", "gemma2".
+ollama_model = "llama3"
+
+# ── Logging ─────────────────────────────────────────────────────────────────────
+
+[log]
+# Minimum log level: "error" | "warn" | "info" | "debug" | "trace". Default: "info".
+# Override at runtime with: RUST_LOG=aegisone_agent=debug
+level = "info"
+
+# Emit logs as newline-delimited JSON (for SIEM / Elastic / Splunk ingestion).
+# Can also be set with: --json-logs flag. Default: false.
+json = false
+
+# Directory for persistent log files. If omitted, logs go to stdout only.
+# log_dir = "C:\\ProgramData\\AegisOne\\logs"
